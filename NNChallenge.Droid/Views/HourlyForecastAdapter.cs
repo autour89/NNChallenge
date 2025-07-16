@@ -48,12 +48,12 @@ public class HourlyForecastViewHolder : RecyclerView.ViewHolder
     public HourlyForecastViewHolder(View itemView)
         : base(itemView)
     {
-        _itemContainer = itemView.FindViewById(0x7f0800f4)!;
-        _dateText = itemView.FindViewById<TextView>(0x7f080095)!;
-        _timeText = itemView.FindViewById<TextView>(0x7f0801e2)!;
-        _conditionText = itemView.FindViewById<TextView>(0x7f080084)!;
-        _humidityText = itemView.FindViewById<TextView>(0x7f0800e5)!;
-        _temperatureText = itemView.FindViewById<TextView>(0x7f0801cf)!;
+        _itemContainer = itemView.FindViewById(Resource.Id.item_container)!;
+        _dateText = itemView.FindViewById<TextView>(Resource.Id.date_text)!;
+        _timeText = itemView.FindViewById<TextView>(Resource.Id.time_text)!;
+        _conditionText = itemView.FindViewById<TextView>(Resource.Id.condition_text)!;
+        _humidityText = itemView.FindViewById<TextView>(Resource.Id.humidity_text)!;
+        _temperatureText = itemView.FindViewById<TextView>(Resource.Id.temperature_text)!;
     }
 
     public void Bind(HourlyForecastItem item)
