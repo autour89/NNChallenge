@@ -6,7 +6,7 @@ using NNChallenge.ViewModels;
 
 namespace NNChallenge.iOS.Views;
 
-public partial class LocationViewController : UIViewController
+public partial class LocationViewController : BaseViewController
 {
     private readonly LocationViewModel _viewModel;
 
@@ -96,7 +96,12 @@ public partial class LocationViewController : UIViewController
         SetupLoadingIndicator();
 
         _viewModel.PropertyChanged += OnViewModelPropertyChanged;
-        _viewModel.OnWeatherDataLoaded = NavigateToForecastView;
+
+        _viewModel.OnWeatherDataLoaded = weatherData =>
+        {
+            var forecastView = new ForecastViewController(weatherData);
+            PushViewController(forecastView);
+        };
     }
 
     private void SetupLoadingIndicator()
@@ -224,18 +229,6 @@ public partial class LocationViewController : UIViewController
         {
             InvokeOnMainThread(UpdateLoadingIndicator);
         }
-    }
-
-    private void NavigateToForecastView(WeatherDataDAO weatherData)
-    {
-        InvokeOnMainThread(() =>
-        {
-            if (weatherData != null)
-            {
-                var forecastView = new ForecastViewController(weatherData);
-                NavigationController?.PushViewController(forecastView, true);
-            }
-        });
     }
 
     private void UpdateWeatherDisplay()
