@@ -11,13 +11,16 @@ namespace NNChallenge.Droid;
 public class MainApplication(IntPtr handle, JniHandleOwnership transfer)
     : Application(handle, transfer)
 {
+    public static Context? CurrentContext { get; private set; }
+
     public override void OnCreate()
     {
         base.OnCreate();
 
+        CurrentContext = this;
+
         App.Initialize(services =>
         {
-            services.AddSingleton<Context>(this);
             services.AddSingleton<INavigationService, NavigationService>();
         });
     }

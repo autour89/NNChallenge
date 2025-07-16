@@ -7,9 +7,13 @@ using NNChallenge.Services;
 
 namespace NNChallenge.Droid.Services;
 
-public class NavigationService(Context context) : INavigationService
+public class NavigationService : INavigationService
 {
-    private readonly Context _context = context;
+    private static Context Context =>
+        MainApplication.CurrentContext
+        ?? throw new InvalidOperationException("Application context is not initialized");
+
+    public static Activity? CurrentActivity { get; set; }
 
     public void NavigateTo<TParameter>(ScreenType screenType, TParameter? parameter = null)
         where TParameter : class
@@ -21,7 +25,7 @@ public class NavigationService(Context context) : INavigationService
             case ScreenType.Forecast:
                 if (parameter is WeatherDataDAO weatherData)
                 {
-                    intent = new Intent(_context, typeof(ForecastActivity));
+                    intent = new Intent(Context, typeof(ForecastActivity));
 
                     var weatherDataJson = JsonSerializer.Serialize(weatherData);
                     intent.PutExtra("WeatherData", weatherDataJson);
@@ -37,14 +41,19 @@ public class NavigationService(Context context) : INavigationService
             return;
         }
 
-        _context.StartActivity(intent);
+        if (CurrentActivity != null)
+        {
+            CurrentActivity.StartActivity(intent);
+        }
+        else
+        {
+            intent.AddFlags(ActivityFlags.NewTask);
+            Context.StartActivity(intent);
+        }
     }
 
     public void GoBack()
     {
-        if (_context is Activity activity)
-        {
-            activity.Finish();
-        }
+        CurrentActivity?.Finish();
     }
 }

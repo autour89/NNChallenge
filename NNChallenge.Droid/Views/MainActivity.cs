@@ -1,30 +1,27 @@
 ﻿using _Microsoft.Android.Resource.Designer;
-using AndroidX.AppCompat.App;
+using Android.App;
+using Android.OS;
+using Android.Widget;
 using NNChallenge.Constants;
-using NNChallenge.Core;
+using NNChallenge.Droid;
 using NNChallenge.ViewModels;
 
 namespace NNChallenge.Droid.Views;
 
 [Activity(Label = "@string/app_name", Theme = "@style/AppTheme.NoActionBar", MainLauncher = true)]
-public class MainActivity : AppCompatActivity
+public class MainActivity : BaseAppCompatActivity<LocationViewModel>
 {
-    private LocationViewModel? _locationViewModel;
-
-    protected override void OnCreate(Bundle? savedInstanceState)
+    protected override void InitializeView(Bundle? savedInstanceState)
     {
-        base.OnCreate(savedInstanceState);
-        SetContentView(ResourceConstant.Layout.activity_location);
+        SetContentView(Resource.Layout.activity_location);
 
-        _locationViewModel = App.GetService<LocationViewModel>();
-
-        var buttonForecast = FindViewById<Button>(ResourceConstant.Id.button_forecast);
+        var buttonForecast = FindViewById<Button>(Resource.Id.button_forecast);
         if (buttonForecast != null)
         {
             buttonForecast.Click += OnForecastClick;
         }
 
-        var spinnerLocations = FindViewById<Spinner>(ResourceConstant.Id.spinner_location);
+        var spinnerLocations = FindViewById<Spinner>(Resource.Id.spinner_location);
         if (spinnerLocations != null)
         {
             var adapter = new ArrayAdapter<string>(
@@ -40,12 +37,12 @@ public class MainActivity : AppCompatActivity
 
     private void OnForecastClick(object? sender, EventArgs e)
     {
-        var spinnerLocations = FindViewById<Spinner>(ResourceConstant.Id.spinner_location);
+        var spinnerLocations = FindViewById<Spinner>(Resource.Id.spinner_location);
         var selectedLocation = spinnerLocations?.SelectedItem?.ToString() ?? string.Empty;
 
-        if (!string.IsNullOrEmpty(selectedLocation) && _locationViewModel is not null)
+        if (!string.IsNullOrEmpty(selectedLocation))
         {
-            _ = _locationViewModel.SelectLocationCommand.ExecuteAsync(selectedLocation);
+            _ = ViewModel.SelectLocationCommand.ExecuteAsync(selectedLocation);
         }
     }
 }

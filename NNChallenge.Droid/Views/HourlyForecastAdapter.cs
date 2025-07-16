@@ -4,14 +4,9 @@ using NNChallenge.Models.DAO;
 
 namespace NNChallenge.Droid.Views;
 
-public class HourlyForecastAdapter : RecyclerView.Adapter
+public class HourlyForecastAdapter(List<HourlyForecastItem> items) : RecyclerView.Adapter
 {
-    private List<HourlyForecastItem> _items;
-
-    public HourlyForecastAdapter(List<HourlyForecastItem> items)
-    {
-        _items = items;
-    }
+    private List<HourlyForecastItem> _items = items;
 
     public override int ItemCount => _items.Count;
 
