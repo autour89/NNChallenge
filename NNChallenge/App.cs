@@ -32,7 +32,7 @@ public class App
 
     static void RegisterCoreServices(IServiceCollection services)
     {
-        if (services == null)
+        if (services is null)
             return;
 
         MapsterConfig.ConfigureMappings();

@@ -4,10 +4,8 @@ namespace NNChallenge.Services;
 
 public interface INavigationService
 {
-    void NavigateTo<TParameter>(ScreenType screenType, TParameter parameter)
+    void NavigateTo<TParameter>(ScreenType screenType, TParameter? parameter = null)
         where TParameter : class;
-
-    void NavigateTo(ScreenType screenType);
 
     void GoBack();
 }

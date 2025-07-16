@@ -1,6 +1,5 @@
 using System.Text.Json;
 using Android.Content;
-using Microsoft.Extensions.Logging;
 using NNChallenge.Constants;
 using NNChallenge.Droid.Views;
 using NNChallenge.Models.DAO;
@@ -8,13 +7,11 @@ using NNChallenge.Services;
 
 namespace NNChallenge.Droid.Services;
 
-public class NavigationService(Context context, ILogger<NavigationService> logger)
-    : INavigationService
+public class NavigationService(Context context) : INavigationService
 {
-    private readonly ILogger<NavigationService> _logger = logger;
     private readonly Context _context = context;
 
-    public void NavigateTo<TParameter>(ScreenType screenType, TParameter parameter)
+    public void NavigateTo<TParameter>(ScreenType screenType, TParameter? parameter = null)
         where TParameter : class
     {
         Intent? intent = null;
@@ -42,8 +39,6 @@ public class NavigationService(Context context, ILogger<NavigationService> logge
 
         _context.StartActivity(intent);
     }
-
-    public void NavigateTo(ScreenType screenType) { }
 
     public void GoBack()
     {

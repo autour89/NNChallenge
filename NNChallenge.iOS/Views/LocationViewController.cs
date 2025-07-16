@@ -1,14 +1,11 @@
 ﻿using System.ComponentModel;
 using NNChallenge.Constants;
-using NNChallenge.Core;
 using NNChallenge.ViewModels;
 
 namespace NNChallenge.iOS.Views;
 
-public partial class LocationViewController : BaseViewController
+public partial class LocationViewController : BaseViewController<LocationViewModel>
 {
-    private readonly LocationViewModel _viewModel;
-
     private UILabel _weatherLocationLabel = null!;
     private UILabel _temperatureLabel = null!;
     private UILabel _conditionLabel = null!;
@@ -17,12 +14,6 @@ public partial class LocationViewController : BaseViewController
     private UIView _loadingOverlay = null!;
     private UIActivityIndicatorView _activityIndicator = null!;
     private UILabel _loadingLabel = null!;
-
-    public LocationViewController()
-        : base(nameof(LocationViewController), null)
-    {
-        _viewModel = App.GetService<LocationViewModel>();
-    }
 
     protected override void InitializeView()
     {
@@ -88,7 +79,7 @@ public partial class LocationViewController : BaseViewController
         SetupWeatherConstraints();
         SetupLoadingIndicator();
 
-        _viewModel.PropertyChanged += OnViewModelPropertyChanged;
+        ViewModel.PropertyChanged += OnViewModelPropertyChanged;
     }
 
     private void SetupLoadingIndicator()
@@ -208,11 +199,11 @@ public partial class LocationViewController : BaseViewController
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(_viewModel.WeatherData))
+        if (e.PropertyName == nameof(ViewModel.WeatherData))
         {
             InvokeOnMainThread(UpdateWeatherDisplay);
         }
-        else if (e.PropertyName == nameof(_viewModel.IsBusy))
+        else if (e.PropertyName == nameof(ViewModel.IsBusy))
         {
             InvokeOnMainThread(UpdateLoadingIndicator);
         }
@@ -220,7 +211,7 @@ public partial class LocationViewController : BaseViewController
 
     private void UpdateWeatherDisplay()
     {
-        var weatherData = _viewModel.WeatherData;
+        var weatherData = ViewModel.WeatherData;
 
         if (weatherData?.Current is not null)
         {
@@ -250,9 +241,9 @@ public partial class LocationViewController : BaseViewController
 
     private void UpdateLoadingIndicator()
     {
-        if (_viewModel.IsBusy)
+        if (ViewModel.IsBusy)
         {
-            _loadingLabel.Text = _viewModel.Title;
+            _loadingLabel.Text = ViewModel.Title;
 
             _loadingOverlay.Hidden = false;
             _activityIndicator.StartAnimating();
@@ -287,7 +278,7 @@ public partial class LocationViewController : BaseViewController
         var selected = _picker.SelectedRowInComponent(0);
         var selectedLocation = LocationConstants.LOCATIONS[selected];
 
-        _ = _viewModel.SelectLocationCommand.ExecuteAsync(selectedLocation);
+        _ = ViewModel.SelectLocationCommand.ExecuteAsync(selectedLocation);
     }
 
     public override void DidReceiveMemoryWarning()
@@ -299,7 +290,7 @@ public partial class LocationViewController : BaseViewController
     {
         if (disposing)
         {
-            _viewModel.PropertyChanged -= OnViewModelPropertyChanged;
+            ViewModel.PropertyChanged -= OnViewModelPropertyChanged;
         }
         base.Dispose(disposing);
     }

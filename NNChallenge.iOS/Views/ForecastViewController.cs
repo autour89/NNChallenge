@@ -1,37 +1,25 @@
-﻿using NNChallenge.Core;
-using NNChallenge.Models.DAO;
+﻿using NNChallenge.Models.DAO;
 using NNChallenge.ViewModels;
 
 namespace NNChallenge.iOS.Views;
 
-public partial class ForecastViewController : BaseViewController
+public partial class ForecastViewController(WeatherDataDAO weatherData)
+    : BaseViewController<ForecastViewModel, WeatherDataDAO>(
+        nameof(ForecastViewController),
+        null,
+        weatherData
+    )
 {
-    private ForecastViewModel _viewModel;
-    private WeatherDataDAO? _weatherData;
     private UICollectionView _collectionView = null!;
     private HourlyForecastDataSource _dataSource = null!;
 
-    public ForecastViewController()
-        : base(nameof(ForecastViewController), null)
-    {
-        _viewModel = App.GetService<ForecastViewModel>();
-    }
-
-    public ForecastViewController(WeatherDataDAO weatherData)
-        : base(nameof(ForecastViewController), null)
-    {
-        _viewModel = App.GetService<ForecastViewModel>();
-        _weatherData = weatherData;
-    }
-
     protected override void InitializeView()
     {
-        Title = !string.IsNullOrEmpty(_weatherData?.Location?.Name)
-            ? $"{_weatherData.Location.Name} Forecast"
+        Title = !string.IsNullOrEmpty(Parameter?.Location?.Name)
+            ? $"{Parameter.Location.Name} Forecast"
             : "3-Day Hourly Forecast";
 
         SetupCollectionView();
-        SetWeatherData(_weatherData);
     }
 
     void SetupCollectionView()
@@ -44,7 +32,7 @@ public partial class ForecastViewController : BaseViewController
             SectionInset = new UIEdgeInsets(16, 16, 16, 16),
         };
 
-        _dataSource = new HourlyForecastDataSource(_viewModel.HourlyItems);
+        _dataSource = new HourlyForecastDataSource(ViewModel.HourlyItems);
 
         _collectionView = new UICollectionView(CGRect.Empty, layout)
         {
@@ -71,17 +59,6 @@ public partial class ForecastViewController : BaseViewController
                 ),
             ]
         );
-    }
-
-    void SetWeatherData(WeatherDataDAO weatherData)
-    {
-        _viewModel.SetWeatherData(weatherData);
-
-        if (_collectionView is not null && _dataSource is not null)
-        {
-            _dataSource.UpdateData(_viewModel.HourlyItems);
-            _collectionView.ReloadData();
-        }
     }
 
     public override void DidReceiveMemoryWarning()

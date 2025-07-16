@@ -8,7 +8,7 @@ using NNChallenge.Services;
 
 namespace NNChallenge.ViewModels;
 
-public partial class ForecastViewModel : BaseViewModel
+public partial class ForecastViewModel : BaseViewModel<WeatherDataDAO>
 {
     private readonly IWeatherService _weatherService;
 
@@ -19,6 +19,11 @@ public partial class ForecastViewModel : BaseViewModel
     {
         _weatherService = weatherService;
         Title = "Weather Forecast";
+    }
+
+    protected override void Initialize(WeatherDataDAO weatherData)
+    {
+        SetWeatherData(weatherData);
     }
 
     [RelayCommand]
@@ -93,5 +98,7 @@ public partial class ForecastViewModel : BaseViewModel
                 }
             }
         }
+
+        OnPropertyChanged(nameof(HourlyItems));
     }
 }
