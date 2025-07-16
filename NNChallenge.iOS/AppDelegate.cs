@@ -1,5 +1,8 @@
-﻿using NNChallenge.Core;
+﻿using Microsoft.Extensions.DependencyInjection;
+using NNChallenge.Core;
+using NNChallenge.iOS.Services;
 using NNChallenge.iOS.Views;
+using NNChallenge.Services;
 
 namespace NNChallenge.iOS;
 
@@ -9,7 +12,7 @@ public class AppDelegate : UIResponder, IUIApplicationDelegate
     [Export("window")]
     public UIWindow? Window { get; set; }
 
-    public static UINavigationController? NavigationController { get; private set; }
+    public static UINavigationController? NavigationController { get; set; }
 
     [Export("application:didFinishLaunchingWithOptions:")]
     public bool FinishedLaunching(UIApplication application, NSDictionary? launchOptions)
@@ -49,12 +52,14 @@ public class AppDelegate : UIResponder, IUIApplicationDelegate
         var firstView = new LocationViewController();
         UINavigationController navigationController = new(firstView);
         Window.RootViewController = navigationController;
-        NavigationController = navigationController;
         Window.MakeKeyAndVisible();
     }
 
     private static void RegisterServices()
     {
-        App.Initialize();
+        App.Initialize(services =>
+        {
+            services.AddSingleton<INavigationService, NavigationService>();
+        });
     }
 }

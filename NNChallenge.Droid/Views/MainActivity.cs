@@ -1,10 +1,7 @@
-﻿using System.Text.Json;
-using _Microsoft.Android.Resource.Designer;
-using Android.Content;
+﻿using _Microsoft.Android.Resource.Designer;
 using AndroidX.AppCompat.App;
 using NNChallenge.Constants;
 using NNChallenge.Core;
-using NNChallenge.Models.DAO;
 using NNChallenge.ViewModels;
 
 namespace NNChallenge.Droid.Views;
@@ -20,11 +17,6 @@ public class MainActivity : AppCompatActivity
         SetContentView(ResourceConstant.Layout.activity_location);
 
         _locationViewModel = App.GetService<LocationViewModel>();
-
-        if (_locationViewModel != null)
-        {
-            _locationViewModel.OnWeatherDataLoaded = NavigateToForecastView;
-        }
 
         var buttonForecast = FindViewById<Button>(ResourceConstant.Id.button_forecast);
         if (buttonForecast != null)
@@ -55,13 +47,5 @@ public class MainActivity : AppCompatActivity
         {
             _ = _locationViewModel.SelectLocationCommand.ExecuteAsync(selectedLocation);
         }
-    }
-
-    private void NavigateToForecastView(WeatherDataDAO weatherData)
-    {
-        var intent = new Intent(this, typeof(ForecastActivity));
-        var weatherDataJson = JsonSerializer.Serialize(weatherData);
-        intent.PutExtra("WeatherData", weatherDataJson);
-        StartActivity(intent);
     }
 }

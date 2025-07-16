@@ -1,21 +1,24 @@
+using Android.Content;
 using Android.Runtime;
+using Microsoft.Extensions.DependencyInjection;
 using NNChallenge.Core;
+using NNChallenge.Droid.Services;
+using NNChallenge.Services;
 
 namespace NNChallenge.Droid;
 
-/// <summary>
-/// Application class for Android - this is where we initialize the DI container
-/// </summary>
 [Application]
-public class MainApplication : Application
+public class MainApplication(IntPtr handle, JniHandleOwnership transfer)
+    : Application(handle, transfer)
 {
-    public MainApplication(IntPtr handle, JniHandleOwnership transfer)
-        : base(handle, transfer) { }
-
     public override void OnCreate()
     {
         base.OnCreate();
 
-        App.Initialize();
+        App.Initialize(services =>
+        {
+            services.AddSingleton<Context>(this);
+            services.AddSingleton<INavigationService, NavigationService>();
+        });
     }
 }

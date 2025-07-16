@@ -4,7 +4,7 @@ using NNChallenge.ViewModels;
 
 namespace NNChallenge.iOS.Views;
 
-public partial class ForecastViewController : UIViewController
+public partial class ForecastViewController : BaseViewController
 {
     private ForecastViewModel _viewModel;
     private WeatherDataDAO? _weatherData;
@@ -24,13 +24,7 @@ public partial class ForecastViewController : UIViewController
         _weatherData = weatherData;
     }
 
-    public override void ViewDidLoad()
-    {
-        base.ViewDidLoad();
-        InitializeView();
-    }
-
-    void InitializeView()
+    protected override void InitializeView()
     {
         Title = !string.IsNullOrEmpty(_weatherData?.Location?.Name)
             ? $"{_weatherData.Location.Name} Forecast"

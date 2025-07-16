@@ -1,4 +1,3 @@
-
 namespace NNChallenge.iOS.Views;
 
 public abstract class BaseViewController : UIViewController
@@ -15,43 +14,17 @@ public abstract class BaseViewController : UIViewController
     protected BaseViewController(IntPtr handle)
         : base(handle) { }
 
-    protected void NavigateToViewController<T>(T viewController, bool animated = true)
-        where T : UIViewController
+    public override void ViewDidLoad()
     {
-        InvokeOnMainThread(() =>
+        base.ViewDidLoad();
+
+        InitializeView();
+
+        if (NavigationController is not null)
         {
-            PresentViewController(viewController, animated, null);
-        });
+            AppDelegate.NavigationController = NavigationController;
+        }
     }
 
-    protected void PushViewController<T>(T viewController, bool animated = true)
-        where T : UIViewController
-    {
-        InvokeOnMainThread(() =>
-        {
-            if (NavigationController != null)
-            {
-                NavigationController.PushViewController(viewController, animated);
-            }
-            else
-            {
-                PresentViewController(viewController, animated, null);
-            }
-        });
-    }
-
-    protected void GoBack(bool animated = true)
-    {
-        InvokeOnMainThread(() =>
-        {
-            if (NavigationController != null)
-            {
-                NavigationController.PopViewController(animated);
-            }
-            else if (PresentingViewController != null)
-            {
-                DismissViewController(animated, null);
-            }
-        });
-    }
+    protected abstract void InitializeView();
 }

@@ -13,6 +13,7 @@ namespace NNChallenge.ViewModels;
 public partial class LocationViewModel : BaseViewModel
 {
     private readonly IWeatherService _weatherService;
+    private readonly INavigationService _navigationService;
     readonly ILogger<LocationViewModel> _logger;
 
     [ObservableProperty]
@@ -27,11 +28,14 @@ public partial class LocationViewModel : BaseViewModel
     [ObservableProperty]
     private WeatherDataDAO? weatherData;
 
-    public Action<WeatherDataDAO>? OnWeatherDataLoaded { get; set; }
-
-    public LocationViewModel(IWeatherService weatherService, ILogger<LocationViewModel> logger)
+    public LocationViewModel(
+        IWeatherService weatherService,
+        INavigationService navigationService,
+        ILogger<LocationViewModel> logger
+    )
     {
         _weatherService = weatherService;
+        _navigationService = navigationService;
         _logger = logger;
         Title = "Select Location";
     }
@@ -63,7 +67,7 @@ public partial class LocationViewModel : BaseViewModel
 
             if (WeatherData != null)
             {
-                OnWeatherDataLoaded?.Invoke(WeatherData);
+                _navigationService.NavigateTo(ScreenType.Forecast, WeatherData);
             }
         }
         catch (NetworkException ex)

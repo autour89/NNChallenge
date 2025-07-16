@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using NNChallenge.Constants;
 using NNChallenge.Core;
-using NNChallenge.Models.DAO;
 using NNChallenge.ViewModels;
 
 namespace NNChallenge.iOS.Views;
@@ -25,13 +24,7 @@ public partial class LocationViewController : BaseViewController
         _viewModel = App.GetService<LocationViewModel>();
     }
 
-    public override void ViewDidLoad()
-    {
-        base.ViewDidLoad();
-        InitializeView();
-    }
-
-    private void InitializeView()
+    protected override void InitializeView()
     {
         Title = "Location";
         _submitButton.TitleLabel.Text = "Submit";
@@ -96,12 +89,6 @@ public partial class LocationViewController : BaseViewController
         SetupLoadingIndicator();
 
         _viewModel.PropertyChanged += OnViewModelPropertyChanged;
-
-        _viewModel.OnWeatherDataLoaded = weatherData =>
-        {
-            var forecastView = new ForecastViewController(weatherData);
-            PushViewController(forecastView);
-        };
     }
 
     private void SetupLoadingIndicator()
