@@ -3,13 +3,13 @@ using NNChallenge.iOS.Views;
 
 namespace NNChallenge.iOS;
 
-// The UIApplicationDelegate for the application. This class is responsible for launching the
-// User Interface of the application, as well as listening (and optionally responding) to application events from iOS.
 [Register("AppDelegate")]
 public class AppDelegate : UIResponder, IUIApplicationDelegate
 {
     [Export("window")]
     public UIWindow? Window { get; set; }
+
+    public static UINavigationController? NavigationController { get; private set; }
 
     [Export("application:didFinishLaunchingWithOptions:")]
     public bool FinishedLaunching(UIApplication application, NSDictionary? launchOptions)
@@ -18,8 +18,6 @@ public class AppDelegate : UIResponder, IUIApplicationDelegate
         NavigateToRoot();
         return true;
     }
-
-    // UISceneSession Lifecycle
 
     [Export("application:configurationForConnectingSceneSession:options:")]
     public UISceneConfiguration GetConfiguration(
@@ -48,12 +46,11 @@ public class AppDelegate : UIResponder, IUIApplicationDelegate
     {
         Window = new UIWindow(UIScreen.MainScreen.Bounds);
 
-        UINavigationController navigationController = [];
-        Window.RootViewController = navigationController;
-        Window.MakeKeyAndVisible();
-
         var firstView = new LocationViewController();
-        navigationController.PushViewController(firstView, true);
+        UINavigationController navigationController = new(firstView);
+        Window.RootViewController = navigationController;
+        NavigationController = navigationController;
+        Window.MakeKeyAndVisible();
     }
 
     private static void RegisterServices()

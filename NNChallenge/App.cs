@@ -13,41 +13,50 @@ public class App
 {
     static IServiceProvider? _container;
     static IServiceCollection? _services;
+    private static bool _isInitialized = false;
 
-    public static void Initialize()
+    public static void Initialize(Action<IServiceCollection>? platformServices = null)
     {
+        if (_isInitialized)
+        {
+            return;
+        }
+
         _services = new ServiceCollection();
-        RegisterCoreServices();
+        RegisterCoreServices(_services);
+        platformServices?.Invoke(_services);
+
         _container = _services.BuildServiceProvider();
+        _isInitialized = true;
     }
 
-    static void RegisterCoreServices()
+    static void RegisterCoreServices(IServiceCollection services)
     {
-        if (_services == null)
+        if (services == null)
             return;
 
         MapsterConfig.ConfigureMappings();
 
-        _services.AddMapster();
+        services.AddMapster();
 
-        _services.AddSingleton(new WeatherApiSettings());
+        services.AddSingleton(new WeatherApiSettings());
 
-        _services.AddLogging(builder =>
+        services.AddLogging(builder =>
         {
             builder.AddConsole();
             builder.AddDebug();
         });
 
-        _services
+        services
             .AddHttpClient($"{nameof(ApiClient<IWeatherApi>)}")
             .AddHttpMessageHandler<ApiMessageHandler>();
 
-        _services.AddScoped(typeof(IApiClient<>), typeof(ApiClient<>));
+        services.AddScoped(typeof(IApiClient<>), typeof(ApiClient<>));
 
-        _services.AddTransient<IWeatherService, WeatherService>();
+        services.AddTransient<IWeatherService, WeatherService>();
 
-        _services.AddTransient<LocationViewModel>();
-        _services.AddTransient<ForecastViewModel>();
+        services.AddTransient<LocationViewModel>();
+        services.AddTransient<ForecastViewModel>();
     }
 
     public static T GetService<T>()
