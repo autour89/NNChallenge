@@ -1,3 +1,15 @@
 ﻿<resources>
     <dimen name="fab_margin">16dp</dimen>
+    
+    <!-- Weather forecast item dimensions -->
+    <dimen name="forecast_item_margin">8dp</dimen>
+    <dimen name="forecast_item_padding">16dp</dimen>
+    <dimen name="forecast_text_margin_top">8dp</dimen>
+    
+    <!-- Weather forecast text sizes -->
+    <dimen name="forecast_date_text_size">16sp</dimen>
+    <dimen name="forecast_time_text_size">18sp</dimen>
+    <dimen name="forecast_condition_text_size">16sp</dimen>
+    <dimen name="forecast_humidity_text_size">14sp</dimen>
+    <dimen name="forecast_temperature_text_size">24sp</dimen>
 </resources>

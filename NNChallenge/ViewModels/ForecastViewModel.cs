@@ -77,7 +77,15 @@ public partial class ForecastViewModel : BaseViewModel
                                 TempC = hour.TempC,
                                 TempF = hour.TempF,
                                 ConditionText = hour.Condition.Text,
+                                ConditionIcon = hour.Condition.Icon,
                                 Humidity = hour.Humidity,
+                                FeelslikeC = hour.FeelslikeC,
+                                FeelslikeF = hour.FeelslikeF,
+                                WindKph = hour.WindKph,
+                                WindMph = hour.WindMph,
+                                WindDirection = hour.WindDirection,
+                                PrecipMm = hour.PrecipMm,
+                                Cloud = hour.Cloud,
                                 IsDay = hour.IsDay,
                             }
                         );

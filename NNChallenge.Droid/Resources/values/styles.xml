@@ -17,4 +17,63 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
 
+    <!-- Weather forecast item styles -->
+    <style name="ForecastItemContainer">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">@dimen/forecast_item_margin</item>
+        <item name="android:padding">@dimen/forecast_item_padding</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:background">@drawable/rounded_background</item>
+    </style>
+
+    <style name="ForecastContentContainer">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">0.6</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="ForecastTextBase">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="ForecastTextWithMargin" parent="ForecastTextBase">
+        <item name="android:layout_marginTop">@dimen/forecast_text_margin_top</item>
+    </style>
+
+    <style name="ForecastDateText" parent="ForecastTextBase">
+        <item name="android:textColor">@color/forecast_date_text</item>
+        <item name="android:textSize">@dimen/forecast_date_text_size</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="ForecastTimeText" parent="ForecastTextWithMargin">
+        <item name="android:textColor">@color/forecast_time_text</item>
+        <item name="android:textSize">@dimen/forecast_time_text_size</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="ForecastConditionText" parent="ForecastTextWithMargin">
+        <item name="android:textColor">@color/forecast_condition_text</item>
+        <item name="android:textSize">@dimen/forecast_condition_text_size</item>
+    </style>
+
+    <style name="ForecastHumidityText" parent="ForecastTextWithMargin">
+        <item name="android:textColor">@color/forecast_humidity_text</item>
+        <item name="android:textSize">@dimen/forecast_humidity_text_size</item>
+    </style>
+
+    <style name="ForecastTemperatureText">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">0.4</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:textColor">@color/forecast_temperature_text</item>
+        <item name="android:textSize">@dimen/forecast_temperature_text_size</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:gravity">center</item>
+    </style>
+
 </resources>
