@@ -12,4 +12,6 @@
     <ItemGroup>
       <ProjectReference Include="..\NNChallenge\NNChallenge.csproj" />
     </ItemGroup>
-</Project>
+
+
+  </Project>

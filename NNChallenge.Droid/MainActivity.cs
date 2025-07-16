@@ -2,21 +2,21 @@
 using Android.Content;
 using AndroidX.AppCompat.App;
 using NNChallenge.Constants;
-using NNChallenge.ViewModels;
+// using NNChallenge.ViewModels;
 
 namespace NNChallenge.Droid;
 
 [Activity(Label = "@string/app_name", Theme = "@style/AppTheme.NoActionBar", MainLauncher = true)]
 public class MainActivity : AppCompatActivity
 {
-    private LocationViewModel? _locationViewModel;
+    // private LocationViewModel? _locationViewModel;
 
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
         SetContentView(ResourceConstant.Layout.activity_location);
 
-        _locationViewModel = ServiceProvider.GetService<LocationViewModel>();
+        // _locationViewModel = App.GetService<LocationViewModel>();
 
         Button buttonForecst = FindViewById<Button>(ResourceConstant.Id.button_forecast)!;
         buttonForecst.Click += OnForecastClick;
@@ -41,11 +41,11 @@ public class MainActivity : AppCompatActivity
         Spinner spinnerLocations = FindViewById<Spinner>(ResourceConstant.Id.spinner_location)!;
         string selectedLocation = spinnerLocations.SelectedItem?.ToString() ?? string.Empty;
 
-        if (!string.IsNullOrEmpty(selectedLocation) && _locationViewModel != null)
-        {
-            // Execute the location selection command
-            _locationViewModel.SelectLocationCommand.Execute(selectedLocation);
-        }
+        // if (!string.IsNullOrEmpty(selectedLocation) && _locationViewModel != null)
+        // {
+        //     // Execute the location selection command
+        //     _locationViewModel.SelectLocationCommand.Execute(selectedLocation);
+        // }
 
         this.StartActivity(new Intent(this, typeof(Views.ForecastActivity)));
     }

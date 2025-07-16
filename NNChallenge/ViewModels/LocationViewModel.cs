@@ -1,14 +1,20 @@
 using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mapster;
+using Microsoft.Extensions.Logging;
+using Microsoft.Maui.Networking;
 using NNChallenge.Constants;
+using NNChallenge.Exceptions;
+using NNChallenge.Models.DAO;
 using NNChallenge.Services;
 
 namespace NNChallenge.ViewModels;
 
 public partial class LocationViewModel : BaseViewModel
 {
-    private readonly INotificationService? _notificationService;
+    private readonly IWeatherService _weatherService;
+    readonly ILogger<LocationViewModel> _logger;
 
     [ObservableProperty]
     private string selectedLocation = string.Empty;
@@ -19,78 +25,61 @@ public partial class LocationViewModel : BaseViewModel
     [ObservableProperty]
     private bool isLocationSelected;
 
-    public LocationViewModel(INotificationService? notificationService = null)
+    [ObservableProperty]
+    private WeatherDataDAO? weatherData;
+
+    public Action<WeatherDataDAO>? OnWeatherDataLoaded { get; set; }
+
+    public LocationViewModel(IWeatherService weatherService, ILogger<LocationViewModel> logger)
     {
-        _notificationService = notificationService;
+        _weatherService = weatherService;
+        _logger = logger;
         Title = "Select Location";
-        UpdateLocationSelection();
     }
 
     [RelayCommand]
     private async Task SelectLocationAsync(string location)
     {
         if (string.IsNullOrEmpty(location))
+        {
             return;
+        }
 
-        SetBusyState(true, "Selecting location...");
+        _logger.LogInformation("Starting weather data load for location: {Location}", location);
+        SetBusyState(true, "Loading weather data...");
 
         try
         {
-            SelectedLocation = location;
-            UpdateLocationSelection();
-
-            if (_notificationService != null)
+            if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
             {
-                await _notificationService.ShowDialogAsync(
-                    "Location Selected",
-                    $"Selected {location}"
+                throw new NetworkException(
+                    "No internet connection available. Please check your network settings and try again."
                 );
             }
 
-            await OnLocationSelectedAsync(location);
+            SelectedLocation = location;
+
+            var weatherResponse = await _weatherService.GetForecastAsync(location, 3);
+            WeatherData = weatherResponse.Adapt<WeatherDataDAO>();
+
+            if (WeatherData != null)
+            {
+                OnWeatherDataLoaded?.Invoke(WeatherData);
+            }
+        }
+        catch (NetworkException ex)
+        {
+            _logger.LogError(ex, "Network error occurred while loading weather data");
+            WeatherData = null;
         }
         catch (Exception ex)
         {
-            if (_notificationService != null)
-            {
-                await _notificationService.ShowDialogAsync(
-                    "Selection Error",
-                    $"Error selecting location: {ex.Message}"
-                );
-            }
-
-            Debug.WriteLine($"Error selecting location: {ex.Message}");
+            _logger.LogError(ex, "Unexpected error occurred while loading weather data");
+            WeatherData = null;
         }
         finally
         {
-            SetBusyState(false);
+            IsBusy = false;
         }
-    }
-
-    [RelayCommand]
-    private void SetSelectedLocation(string location)
-    {
-        if (string.IsNullOrEmpty(location))
-            return;
-
-        SelectedLocation = location;
-        UpdateLocationSelection();
-    }
-
-    [RelayCommand]
-    private void ClearSelection()
-    {
-        SelectedLocation = string.Empty;
-        UpdateLocationSelection();
-    }
-
-    private void UpdateLocationSelection()
-    {
-        IsLocationSelected = !string.IsNullOrEmpty(SelectedLocation);
-    }
-
-    protected virtual Task OnLocationSelectedAsync(string location)
-    {
-        return Task.CompletedTask;
     }
 }

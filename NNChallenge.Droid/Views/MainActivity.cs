@@ -2,7 +2,9 @@
 using Android.Content;
 using AndroidX.AppCompat.App;
 using NNChallenge.Constants;
+using NNChallenge.Core;
 using NNChallenge.ViewModels;
+using System.Text.Json;
 
 namespace NNChallenge.Droid.Views;
 
@@ -16,7 +18,7 @@ public class MainActivity : AppCompatActivity
         base.OnCreate(savedInstanceState);
         SetContentView(ResourceConstant.Layout.activity_location);
 
-        _locationViewModel = ServiceProvider.GetService<LocationViewModel>();
+        _locationViewModel = App.GetService<LocationViewModel>();
 
         var buttonForecast = FindViewById<Button>(ResourceConstant.Id.button_forecast);
         if (buttonForecast != null)
@@ -38,16 +40,30 @@ public class MainActivity : AppCompatActivity
         }
     }
 
-    private void OnForecastClick(object? sender, EventArgs e)
+    private async void OnForecastClick(object? sender, EventArgs e)
     {
         var spinnerLocations = FindViewById<Spinner>(ResourceConstant.Id.spinner_location);
         var selectedLocation = spinnerLocations?.SelectedItem?.ToString() ?? string.Empty;
 
         if (!string.IsNullOrEmpty(selectedLocation) && _locationViewModel != null)
         {
+            // Execute the weather loading command
             _locationViewModel.SelectLocationCommand.Execute(selectedLocation);
-        }
 
-        StartActivity(new Intent(this, typeof(ForecastActivity)));
+            // Wait for the weather data to be loaded
+            while (_locationViewModel.IsBusy)
+            {
+                await Task.Delay(100);
+            }
+
+            // Navigate to ForecastActivity with weather data
+            if (_locationViewModel.WeatherData != null)
+            {
+                var intent = new Intent(this, typeof(ForecastActivity));
+                var weatherDataJson = JsonSerializer.Serialize(_locationViewModel.WeatherData);
+                intent.PutExtra("WeatherData", weatherDataJson);
+                StartActivity(intent);
+            }
+        }
     }
 }

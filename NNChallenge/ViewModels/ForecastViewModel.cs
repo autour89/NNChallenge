@@ -1,8 +1,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mapster;
 using Microsoft.Maui.Networking;
 using NNChallenge.Exceptions;
-using NNChallenge.Models;
+using NNChallenge.Models.DAO;
 using NNChallenge.Services;
 
 namespace NNChallenge.ViewModels;
@@ -10,33 +11,13 @@ namespace NNChallenge.ViewModels;
 public partial class ForecastViewModel : BaseViewModel
 {
     private readonly IWeatherService _weatherService;
-    private readonly INotificationService? _notificationService;
 
     [ObservableProperty]
-    private string currentLocation = string.Empty;
+    private List<HourlyForecastItem> hourlyItems = [];
 
-    [ObservableProperty]
-    private WeatherResponse? currentForecast;
-
-    [ObservableProperty]
-    private List<ForecastDay> forecastList = [];
-
-    [ObservableProperty]
-    private bool hasForecast;
-
-    [ObservableProperty]
-    private string temperatureDisplay = string.Empty;
-
-    [ObservableProperty]
-    private string conditionDisplay = string.Empty;
-
-    public ForecastViewModel(
-        IWeatherService weatherService,
-        INotificationService? notificationService = null
-    )
+    public ForecastViewModel(IWeatherService weatherService)
     {
         _weatherService = weatherService;
-        _notificationService = notificationService;
         Title = "Weather Forecast";
     }
 
@@ -44,7 +25,9 @@ public partial class ForecastViewModel : BaseViewModel
     private async Task LoadForecastAsync(string location)
     {
         if (string.IsNullOrEmpty(location))
+        {
             return;
+        }
 
         SetBusyState(true, "Loading forecast...");
 
@@ -57,91 +40,50 @@ public partial class ForecastViewModel : BaseViewModel
                 );
             }
 
-            CurrentLocation = location;
-
             var weatherResponse = await _weatherService.GetForecastAsync(location, 3);
-            CurrentForecast = weatherResponse;
-            ForecastList = weatherResponse.Forecast.ForecastDay;
+            var weatherDataDAO = weatherResponse.Adapt<WeatherDataDAO>();
 
-            if (weatherResponse.Current != null)
-            {
-                TemperatureDisplay =
-                    $"{weatherResponse.Current.TempC:F1}°C / {weatherResponse.Current.TempF:F1}°F";
-                ConditionDisplay = weatherResponse.Current.Condition.Text;
-            }
-
-            HasForecast = weatherResponse != null && weatherResponse.Forecast.ForecastDay.Any();
-
-            if (_notificationService != null)
-            {
-                await _notificationService.ShowDialogAsync(
-                    "Weather Loaded",
-                    $"Forecast for {location} loaded successfully"
-                );
-            }
+            SetWeatherData(weatherDataDAO);
         }
-        catch (NetworkException ex)
-        {
-            if (_notificationService != null)
-            {
-                await _notificationService.ShowDialogAsync("Network Error", ex.Message);
-            }
-
-            HasForecast = false;
-            TemperatureDisplay = "N/A";
-            ConditionDisplay = "No connection";
-        }
-        catch (Exception)
-        {
-            if (_notificationService != null)
-            {
-                await _notificationService.ShowDialogAsync(
-                    "Error",
-                    "Unable to load weather data. Please try again."
-                );
-            }
-
-            HasForecast = false;
-            TemperatureDisplay = "N/A";
-            ConditionDisplay = "Unable to load weather data";
-        }
+        catch (NetworkException) { }
+        catch (Exception) { }
         finally
         {
-            SetBusyState(false);
+            IsBusy = false;
         }
     }
 
-    [RelayCommand]
-    private async Task RefreshForecastAsync()
+    public void SetWeatherData(WeatherDataDAO weatherData)
     {
-        if (!string.IsNullOrEmpty(CurrentLocation))
+        if (weatherData is null)
         {
-            await LoadForecastAsync(CurrentLocation);
+            return;
         }
-    }
 
-    [RelayCommand]
-    private void ClearForecast()
-    {
-        CurrentForecast = null;
-        ForecastList.Clear();
-        HasForecast = false;
-        CurrentLocation = string.Empty;
-        TemperatureDisplay = string.Empty;
-        ConditionDisplay = string.Empty;
-    }
+        HourlyItems.Clear();
 
-    [RelayCommand]
-    private async Task TestWeatherApiAsync()
-    {
-        await LoadForecastAsync("Berlin");
-    }
-
-    public async Task LoadForecastForSelectedLocationAsync()
-    {
-        if (!string.IsNullOrEmpty(CurrentLocation))
+        if (weatherData.Forecast?.ForecastDays != null)
         {
-            await LoadForecastAsync(CurrentLocation);
+            foreach (var forecastDay in weatherData.Forecast.ForecastDays)
+            {
+                if (forecastDay.Hours != null)
+                {
+                    foreach (var hour in forecastDay.Hours)
+                    {
+                        HourlyItems.Add(
+                            new HourlyForecastItem
+                            {
+                                Time = hour.Time,
+                                TempC = hour.TempC,
+                                TempF = hour.TempF,
+                                ConditionText = hour.Condition.Text,
+                                Humidity = hour.Humidity,
+                                IsDay = hour.IsDay,
+                            }
+                        );
+                    }
+                }
+            }
         }
     }
 }

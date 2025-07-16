@@ -11,5 +11,6 @@ public interface IWeatherApi
         [Query] string q,
         [Query] int days = 3,
         [Query] string aqi = "no",
-        [Query] string alerts = "no");
+        [Query] string alerts = "no"
+    );
 }

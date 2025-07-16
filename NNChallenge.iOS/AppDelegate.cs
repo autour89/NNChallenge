@@ -1,4 +1,4 @@
-﻿using NNChallenge.iOS.Services;
+﻿using NNChallenge.Core;
 using NNChallenge.iOS.Views;
 
 namespace NNChallenge.iOS;
@@ -14,20 +14,8 @@ public class AppDelegate : UIResponder, IUIApplicationDelegate
     [Export("application:didFinishLaunchingWithOptions:")]
     public bool FinishedLaunching(UIApplication application, NSDictionary? launchOptions)
     {
-        ServiceProvider.Initialize(services =>
-        {
-            services.AddIOSServices();
-        });
-
-        Window = new UIWindow(UIScreen.MainScreen.Bounds);
-
-        UINavigationController navigationController = new UINavigationController();
-        Window.RootViewController = navigationController;
-        Window.MakeKeyAndVisible();
-
-        var firstView = new LocationViewController();
-        navigationController.PushViewController(firstView, true);
-
+        RegisterServices();
+        NavigateToRoot();
         return true;
     }
 
@@ -54,5 +42,22 @@ public class AppDelegate : UIResponder, IUIApplicationDelegate
         // Called when the user discards a scene session.
         // If any sessions were discarded while the application was not running, this will be called shortly after `FinishedLaunching`.
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
+    }
+
+    void NavigateToRoot()
+    {
+        Window = new UIWindow(UIScreen.MainScreen.Bounds);
+
+        UINavigationController navigationController = [];
+        Window.RootViewController = navigationController;
+        Window.MakeKeyAndVisible();
+
+        var firstView = new LocationViewController();
+        navigationController.PushViewController(firstView, true);
+    }
+
+    private static void RegisterServices()
+    {
+        App.Initialize();
     }
 }

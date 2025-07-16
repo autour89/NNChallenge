@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>true</ImplicitUsings>
     <SupportedOSPlatformVersion>21.0</SupportedOSPlatformVersion>
+    <TargetPlatformVersion>35</TargetPlatformVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\NNChallenge\NNChallenge.csproj" />

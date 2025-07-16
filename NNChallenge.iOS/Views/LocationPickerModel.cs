@@ -1,30 +1,14 @@
-using Foundation;
-using UIKit;
+namespace NNChallenge.iOS.Views;
 
-namespace NNChallenge.iOS.Views
+public class LocationPickerModel(string[] locations) : UIPickerViewModel
 {
-    public class LocationPickerModel : UIPickerViewModel
-    {
-        private readonly string[] _locations;
+    private readonly string[] _locations = locations;
 
-        public LocationPickerModel(string[] locations)
-        {
-            _locations = locations;
-        }
+    public override nint GetComponentCount(UIPickerView pickerView) => 1;
 
-        public override nint GetComponentCount(UIPickerView pickerView)
-        {
-            return 1;
-        }
+    public override nint GetRowsInComponent(UIPickerView pickerView, nint component) =>
+        _locations.Length;
 
-        public override nint GetRowsInComponent(UIPickerView pickerView, nint component)
-        {
-            return _locations.Length;
-        }
-
-        public override string GetTitle(UIPickerView pickerView, nint row, nint component)
-        {
-            return _locations[row];
-        }
-    }
+    public override string GetTitle(UIPickerView pickerView, nint row, nint component) =>
+        _locations[row];
 }

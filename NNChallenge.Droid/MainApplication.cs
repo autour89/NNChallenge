@@ -1,5 +1,5 @@
 using Android.Runtime;
-using NNChallenge.Droid.Services;
+using NNChallenge.Core;
 
 namespace NNChallenge.Droid;
 
@@ -16,9 +16,6 @@ public class MainApplication : Application
     {
         base.OnCreate();
 
-        ServiceProvider.Initialize(services =>
-        {
-            services.AddAndroidServices();
-        });
+        App.Initialize();
     }
 }
