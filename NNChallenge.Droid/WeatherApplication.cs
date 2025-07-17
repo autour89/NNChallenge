@@ -8,8 +8,8 @@ using NNChallenge.Services;
 namespace NNChallenge.Droid;
 
 [Application]
-public class MainApplication(IntPtr handle, JniHandleOwnership transfer)
-    : Application(handle, transfer)
+public class WeatherApplication(IntPtr handle, JniHandleOwnership ownership)
+    : Application(handle, ownership)
 {
     public static Context? CurrentContext { get; private set; }
 

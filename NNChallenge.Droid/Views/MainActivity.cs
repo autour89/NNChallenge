@@ -1,19 +1,15 @@
 ﻿using _Microsoft.Android.Resource.Designer;
-using Android.App;
-using Android.OS;
-using Android.Widget;
 using NNChallenge.Constants;
-using NNChallenge.Droid;
 using NNChallenge.ViewModels;
 
 namespace NNChallenge.Droid.Views;
 
 [Activity(Label = "@string/app_name", Theme = "@style/AppTheme.NoActionBar", MainLauncher = true)]
-public class MainActivity : BaseAppCompatActivity<LocationViewModel>
+public class MainActivity : BaseAppCompatView<LocationViewModel>
 {
     protected override void InitializeView(Bundle? savedInstanceState)
     {
-        SetContentView(Resource.Layout.activity_location);
+        SetContentView(ResourceConstant.Layout.activity_location);
 
         var buttonForecast = FindViewById<Button>(Resource.Id.button_forecast);
         if (buttonForecast != null)

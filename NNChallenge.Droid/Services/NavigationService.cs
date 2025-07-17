@@ -1,7 +1,6 @@
 using System.Text.Json;
 using Android.Content;
 using NNChallenge.Constants;
-using NNChallenge.Droid.Views;
 using NNChallenge.Models.DAO;
 using NNChallenge.Services;
 
@@ -10,7 +9,7 @@ namespace NNChallenge.Droid.Services;
 public class NavigationService : INavigationService
 {
     private static Context Context =>
-        MainApplication.CurrentContext
+        WeatherApplication.CurrentContext
         ?? throw new InvalidOperationException("Application context is not initialized");
 
     public static Activity? CurrentActivity { get; set; }

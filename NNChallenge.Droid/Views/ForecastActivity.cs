@@ -1,12 +1,13 @@
 ﻿using System.Text.Json;
 using AndroidX.RecyclerView.Widget;
+using NNChallenge.Droid.Views;
 using NNChallenge.Models.DAO;
 using NNChallenge.ViewModels;
 
-namespace NNChallenge.Droid.Views;
+namespace NNChallenge.Droid;
 
-[Activity(Label = "Forecast")]
-public class ForecastActivity : BaseActivity<ForecastViewModel, WeatherDataDAO>
+[Activity(Label = "ForecastActivity")]
+public class ForecastActivity : BaseView<ForecastViewModel, WeatherDataDAO>
 {
     private RecyclerView _recyclerView = null!;
     private HourlyForecastAdapter _adapter = null!;

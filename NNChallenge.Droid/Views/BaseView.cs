@@ -5,9 +5,9 @@ using NNChallenge.ViewModels;
 
 namespace NNChallenge.Droid.Views;
 
-public abstract class BaseActivity : Activity
+public abstract class BaseView : Activity
 {
-    protected BaseActivity() { }
+    protected BaseView() { }
 
     protected override void OnCreate(Bundle? savedInstanceState)
     {
@@ -34,9 +34,9 @@ public abstract class BaseActivity : Activity
     protected abstract void InitializeView(Bundle? savedInstanceState);
 }
 
-public abstract class BaseAppCompatActivity : AppCompatActivity
+public abstract class BaseAppCompatView : AppCompatActivity
 {
-    protected BaseAppCompatActivity() { }
+    protected BaseAppCompatView() { }
 
     protected override void OnCreate(Bundle? savedInstanceState)
     {
@@ -63,35 +63,35 @@ public abstract class BaseAppCompatActivity : AppCompatActivity
     protected abstract void InitializeView(Bundle? savedInstanceState);
 }
 
-public abstract class BaseActivity<TViewModel> : BaseActivity
+public abstract class BaseView<TViewModel> : BaseView
     where TViewModel : BaseViewModel
 {
     protected TViewModel ViewModel { get; }
 
-    protected BaseActivity()
+    protected BaseView()
     {
         ViewModel = App.GetService<TViewModel>();
     }
 }
 
-public abstract class BaseAppCompatActivity<TViewModel> : BaseAppCompatActivity
+public abstract class BaseAppCompatView<TViewModel> : BaseAppCompatView
     where TViewModel : BaseViewModel
 {
     protected TViewModel ViewModel { get; }
 
-    protected BaseAppCompatActivity()
+    protected BaseAppCompatView()
     {
         ViewModel = App.GetService<TViewModel>();
     }
 }
 
-public abstract class BaseActivity<TViewModel, TParameter> : BaseActivity<TViewModel>
+public abstract class BaseView<TViewModel, TParameter> : BaseView<TViewModel>
     where TViewModel : BaseViewModel<TParameter>
     where TParameter : class
 {
     protected TParameter? Parameter { get; private set; }
 
-    protected BaseActivity()
+    protected BaseView()
         : base() { }
 
     protected void SetParameter(TParameter parameter)
@@ -104,14 +104,14 @@ public abstract class BaseActivity<TViewModel, TParameter> : BaseActivity<TViewM
     }
 }
 
-public abstract class BaseAppCompatActivity<TViewModel, TParameter>
-    : BaseAppCompatActivity<TViewModel>
+public abstract class BaseAppCompatView<TViewModel, TParameter>
+    : BaseAppCompatView<TViewModel>
     where TViewModel : BaseViewModel<TParameter>
     where TParameter : class
 {
     protected TParameter? Parameter { get; private set; }
 
-    protected BaseAppCompatActivity()
+    protected BaseAppCompatView()
         : base() { }
 
     protected void SetParameter(TParameter parameter)
