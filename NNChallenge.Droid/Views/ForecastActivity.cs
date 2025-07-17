@@ -1,10 +1,11 @@
-﻿using System.Text.Json;
+﻿using System.ComponentModel;
+using System.Text.Json;
+using Android.Views;
 using AndroidX.RecyclerView.Widget;
+using AndroidX.SwipeRefreshLayout.Widget;
 using NNChallenge.Droid.Views;
 using NNChallenge.Models.DAO;
 using NNChallenge.ViewModels;
-using AndroidX.AppCompat.Widget;
-using Android.Views;
 
 namespace NNChallenge.Droid;
 
@@ -13,12 +14,13 @@ public class ForecastActivity : BaseAppCompatView<ForecastViewModel, WeatherData
 {
     private RecyclerView _recyclerView = null!;
     private HourlyForecastAdapter _adapter = null!;
+    private SwipeRefreshLayout _swipeRefreshLayout = null!;
+    private string _currentLocation = string.Empty;
 
     protected override void InitializeView(Bundle? savedInstanceState)
     {
         SetContentView(Resource.Layout.forecast_activity);
 
-        // Setup toolbar with back button
         var toolbar = FindViewById<AndroidX.AppCompat.Widget.Toolbar>(Resource.Id.toolbar);
         if (toolbar != null)
         {
@@ -28,7 +30,16 @@ public class ForecastActivity : BaseAppCompatView<ForecastViewModel, WeatherData
         }
 
         LoadWeatherData();
+        SetupSwipeRefresh();
         SetupRecyclerView();
+
+        ViewModel.PropertyChanged += OnViewModelPropertyChanged;
+    }
+
+    public override bool OnCreateOptionsMenu(IMenu? menu)
+    {
+        MenuInflater.Inflate(Resource.Menu.forecast_menu, menu);
+        return true;
     }
 
     public override bool OnOptionsItemSelected(IMenuItem item)
@@ -36,6 +47,14 @@ public class ForecastActivity : BaseAppCompatView<ForecastViewModel, WeatherData
         if (item.ItemId == Android.Resource.Id.Home)
         {
             Finish();
+            return true;
+        }
+        else if (item.ItemId == Resource.Id.action_refresh)
+        {
+            if (!string.IsNullOrEmpty(_currentLocation))
+            {
+                _ = ViewModel.LoadForecastCommand.ExecuteAsync(_currentLocation);
+            }
             return true;
         }
         return base.OnOptionsItemSelected(item);
@@ -50,6 +69,48 @@ public class ForecastActivity : BaseAppCompatView<ForecastViewModel, WeatherData
         _recyclerView.SetAdapter(_adapter);
     }
 
+    private void SetupSwipeRefresh()
+    {
+        _swipeRefreshLayout = FindViewById<SwipeRefreshLayout>(Resource.Id.swipe_refresh_layout)!;
+        _swipeRefreshLayout.Refresh += OnRefresh;
+
+        _swipeRefreshLayout.SetColorSchemeResources(
+            Android.Resource.Color.HoloBlueLight,
+            Android.Resource.Color.HoloGreenLight,
+            Android.Resource.Color.HoloOrangeLight,
+            Android.Resource.Color.HoloRedLight
+        );
+    }
+
+    private void OnRefresh(object? sender, EventArgs e)
+    {
+        if (!string.IsNullOrEmpty(_currentLocation))
+        {
+            _ = ViewModel.LoadForecastCommand.ExecuteAsync(_currentLocation);
+        }
+    }
+
+    private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ViewModel.IsBusy))
+        {
+            RunOnUiThread(() =>
+            {
+                if (_swipeRefreshLayout != null)
+                {
+                    _swipeRefreshLayout.Refreshing = ViewModel.IsBusy;
+                }
+            });
+        }
+        else if (e.PropertyName == nameof(ViewModel.HourlyItems))
+        {
+            RunOnUiThread(() =>
+            {
+                _adapter?.UpdateData(ViewModel.HourlyItems);
+            });
+        }
+    }
+
     private void LoadWeatherData()
     {
         var weatherDataJson = Intent?.GetStringExtra("WeatherData");
@@ -58,8 +119,9 @@ public class ForecastActivity : BaseAppCompatView<ForecastViewModel, WeatherData
             var weatherData = JsonSerializer.Deserialize<WeatherDataDAO>(weatherDataJson);
             if (weatherData is not null)
             {
-                // Set the title with city name
                 var cityName = weatherData.Location?.Name ?? "Unknown";
+                _currentLocation = cityName;
+
                 if (SupportActionBar != null)
                     SupportActionBar.Title = $"{cityName} Forecast";
 
@@ -73,5 +135,20 @@ public class ForecastActivity : BaseAppCompatView<ForecastViewModel, WeatherData
             if (SupportActionBar != null)
                 SupportActionBar.Title = "3-Day Hourly Forecast";
         }
+    }
+
+    protected override void OnDestroy()
+    {
+        if (ViewModel != null)
+        {
+            ViewModel.PropertyChanged -= OnViewModelPropertyChanged;
+        }
+
+        if (_swipeRefreshLayout != null)
+        {
+            _swipeRefreshLayout.Refresh -= OnRefresh;
+        }
+
+        base.OnDestroy();
     }
 }
