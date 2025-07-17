@@ -104,8 +104,7 @@ public abstract class BaseView<TViewModel, TParameter> : BaseView<TViewModel>
     }
 }
 
-public abstract class BaseAppCompatView<TViewModel, TParameter>
-    : BaseAppCompatView<TViewModel>
+public abstract class BaseAppCompatView<TViewModel, TParameter> : BaseAppCompatView<TViewModel>
     where TViewModel : BaseViewModel<TParameter>
     where TParameter : class
 {
